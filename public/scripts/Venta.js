@@ -57,7 +57,7 @@ function init(){
                         //window.open("/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val() , "TICKET" , "width=396,height=430,scrollbars=NO");
                        // window.open("localhost/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val());
                         //location.href = "/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val();
-                    window.open("/amondocorre/SISVentas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val(), '_blank');
+                    window.open("/lhome/Reportes/exTicket.php?id=" + $("#txtIdPedido").val(), '_blank');
                 }
                 if ($("#cboTipoVenta").val() == "Contado") {
 
