@@ -57,12 +57,13 @@ function init(){
                         //window.open("/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val() , "TICKET" , "width=396,height=430,scrollbars=NO");
                        // window.open("localhost/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val());
                         //location.href = "/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val();
-                    window.open("/SISVentas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val(), '_blank');
+                    window.open("/amondocorre/SISVentas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val(), '_blank');
                 }
                 if ($("#cboTipoVenta").val() == "Contado") {
 
                     swal("Mensaje del Sistema", r, "success");
 
+                    /*
                     $("#btnNuevoPedido").show();
                     OcultarForm();
                     ListadoVenta();
@@ -79,7 +80,7 @@ function init(){
                            })                     
                         } 
                       }
-                    });
+                    });*/
 
                     //location.reload();
                 } else {
