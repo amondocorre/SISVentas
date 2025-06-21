@@ -58,6 +58,7 @@ function init(){
                        // window.open("localhost/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val());
                         //location.href = "/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val();
                     window.open("/lhome/Reportes/exTicket.php?id=" + $("#txtIdPedido").val(), '_blank');
+                    
                 }
                 if ($("#cboTipoVenta").val() == "Contado") {
 
