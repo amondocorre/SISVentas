@@ -100,13 +100,14 @@ $reg_igv = $query_global->fetch_object();
     <tr>
       <td colspan="3" align="center">¡Gracias por su compra!</td>
     </tr>
+    <!--
     <tr>
       <td colspan="3" align="center">AhorroCel</td>
     </tr>
     <tr>
       <td colspan="3" align="center">Hermosillo - México</td>
     </tr>
-    
+  -->
 </table>
 <br>
 </div>
