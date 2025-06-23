@@ -98,6 +98,34 @@ switch ($_GET["op"]) {
             echo json_encode($reg);
 
             break;
+    case "GetVentaById":
+
+            require_once "../model/Pedido.php";
+            require_once "../model/Configuracion.php";
+
+            $objPedido = new Pedido();
+
+            $idpedido = $_REQUEST["idPedido"];
+
+            $query = $objPedido->GetVenta($idpedido);
+            $reg = $query->fetch_object();
+            $objConfiguracion = new Configuracion();
+            $query_global = $objConfiguracion->Listar();
+            $config = $query_global->fetch_object();
+            $detalle = array();
+            $query_total = $objPedido->TotalPedido($idpedido);
+            $reg_total = $query_total->fetch_object();
+            while ($det = $query->fetch_object()) {
+              array_push($detalle,$det);
+            }
+            $results = array(
+            "venta" => $reg,
+            "detalle" => $detalle,
+            "nombre_impresora" => '',
+            "simbolo_moneda" => $config->simbolo_moneda,
+            "total"=>$reg_total->Total);
+            echo json_encode($results);
+            break;
 
     case "GetDetalleCantStock":
         require_once "../model/Pedido.php";

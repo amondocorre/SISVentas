@@ -54,10 +54,12 @@ function init(){
 
             $.post("./ajax/VentaAjax.php?op=SaveOrUpdate", data, function(r){// llamamos la url por post. function(r). r-> llamada del callback
                 if ($("#cboTipoComprobante").val() == "TICKET") {
+                  guardarYImprimir();
+                  //await PrintTicket($("#txtIdPedido").val())
                         //window.open("/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val() , "TICKET" , "width=396,height=430,scrollbars=NO");
                        // window.open("localhost/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val());
                         //location.href = "/solventas/Reportes/exTicket.php?id=" + $("#txtIdPedido").val();
-                    window.open("/lhome/Reportes/exTicket.php?id=" + $("#txtIdPedido").val(), '_blank');
+                    //window.open("/lhome/Reportes/exTicket.php?id=" + $("#txtIdPedido").val(), '_blank');
                     
                 }
                 if ($("#cboTipoVenta").val() == "Contado") {
@@ -109,12 +111,22 @@ function init(){
                     });
 
                 }
-                
+                location.reload();
             });
         } else {
             bootbox.alert("Debe seleccionar un comprobante");
         }
 	};
+  async function guardarYImprimir() {
+  try {
+    const id = $("#txtIdPedido").val();
+    if (!id) throw new Error("ID de pedido no válido.");
+    const data = await GetVentaById(id);
+    await PrintTicket(data);
+  } catch (error) {
+    console.error("Error durante guardar e imprimir:", error);
+  }
+}
 
     function SaveCredito(e){
         e.preventDefault();// para que no se recargue la pagina
@@ -279,3 +291,24 @@ function pasarIdPedido(idPedido, total, correo){// funcion que llamamos del arch
 
         $("#txtTotalPed").val(Math.round(total*100)/100);
  	}
+  function GetVentaById(idPedido) {
+  return new Promise((resolve, reject) => {
+    $.getJSON("./ajax/PedidoAjax.php?op=GetVentaById", { idPedido }, function(r) {
+      resolve(r);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      reject(new Error("Error al obtener la venta: " + textStatus));
+    });
+  });
+}
+async function PrintTicket(data) {
+  const url = "https://ventas.local/printTicket";
+  await $.ajax({
+    url: url,
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(data),
+    success: function (r) {
+      //console.log("Respuesta del servidor:", r);
+    }
+  });
+}

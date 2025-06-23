@@ -153,7 +153,6 @@ function init() {
     }
 
     function GenerarVenta(e){
-      console.log('hhhhhhhhhhhhhh')
         e.preventDefault();
     
         if ($("#txtIdCliente").val() != "") {
@@ -195,7 +194,7 @@ function init() {
                                     //$("#VerVentaDetallePedido").hide();
                                     $("#btnEnviarCorreo").hide();
                                     ComboTipoDoc();
-                                    $("#cboTipoComprobante").val("TICKET");
+                                    //$("#cboTipoComprobante").val("TICKET");
                                     $('table#tblDetallePedidoVer th:nth-child(4)').hide();
                                     $('table#tblDetallePedidoVer th:nth-child(8)').hide();
 
@@ -254,13 +253,23 @@ function init() {
     }
 
        
-    function ComboTipoDoc() {
-
+    function ComboTipoDoc2() {
         $.get("./ajax/PedidoAjax.php?op=listTipoDoc", function(r) {
                 $("#cboTipoComprobante").html(r);
                 $("#cboTipoComprobante").val("TICKET");
+                VerNumSerie();
         })
     }
+    async function ComboTipoDoc() {
+        try {
+          const tipoDocHTML = await $.get("./ajax/PedidoAjax.php?op=listTipoDoc");
+          $("#cboTipoComprobante").html(tipoDocHTML);
+          $("#cboTipoComprobante").val("TICKET");
+          await VerNumSerie();
+        } catch (error) {
+          console.error("Error al cargar ComboTipoDoc:", error);
+        }
+      }
 
     function GetImpuesto() {
 
@@ -279,15 +288,22 @@ function init() {
         })
     }
 
-    function VerNumSerie(){
+   function VerNumSerie(){
     	var nombre = $("#cboTipoComprobante").val();
+        var idsucursal = $("#txtIdSucursal").val();
 
-            $.getJSON("./ajax/PedidoAjax.php?op=GetTipoDocSerieNum", {nombre: nombre}, function(r) {
+            $.getJSON("./ajax/VentaAjax.php?op=GetTipoDocSerieNum", {nombre: nombre,idsucursal: idsucursal}, function(r) {
                 if (r) {
-                    $("#txtSerie").val(r.ultima_serie);
-                    $("#txtNumeroPed").val(r.ultimo_numero);
+                    $("#txtIdTipoDoc").val(r.iddetalle_documento_sucursal);
+                    $("#txtSerieVent").val(r.ultima_serie);
+                    $("#txtNumeroVent").val(r.ultimo_numero);
+                } else {
+                    $("#txtIdTipoDoc").val("");
+                	$("#txtSerieVent").val("");
+                    $("#txtNumeroVent").val("");
                 }
             });
+
     }
 
     function VerForm(){
@@ -776,7 +792,6 @@ function ConsultarDetallesPed() {
 
         $.get("./ajax/PedidoAjax.php?op=listTipoDoc", function(r) {
                 $("#cboTipoComprobante").html(r);
-            
         })
     }
 
@@ -807,7 +822,6 @@ function ConsultarDetallesPed() {
         let codigo = $("#txtCodigoBarras").val();
         const yaExiste = elementos.some(item => item[6] === codigo); 
         if (yaExiste) {
-          //alert("El producto ya fue agregado anteriormente.");
           bootbox.alert("El producto ya fue agregado anteriormente.");
           return;
         }
@@ -820,6 +834,7 @@ function ConsultarDetallesPed() {
               const articulo = s.data;
               var detalles = new Array(articulo.iddetalle_ingreso,articulo.Articulo,articulo.precio_ventapublico,"1","0.0",articulo.stock_actual, articulo.codigo, articulo.serie); 
               elementos.push(detalles);
+              $("#txtCodigoBarras").val('')
               ConsultarDetallesPed();
             } else{
               bootbox.alert("No se encontro el producto.");
