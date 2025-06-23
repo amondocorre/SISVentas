@@ -333,6 +333,19 @@ switch ($_GET["op"]) {
             echo json_encode($reg_total);
 
             break;
+    case "getArticleByCodigo":
+        require_once "../model/Pedido.php";
+        $objPedido = new Pedido();
+        $codigo = $_REQUEST["codigo"];
+        $query_cli = $objPedido->getArticleByCodigo($codigo, $_SESSION["idsucursal"]);
 
+        $data = $query_cli->fetch_object();
+        $results = array(
+        "status" => $data?'success':'error',
+        "codigo" => $codigo,
+        "data" => $data);
+        echo json_encode($results);
+        
+        break;
 }
 	

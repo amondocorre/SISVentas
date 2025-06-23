@@ -1,6 +1,6 @@
 $(document).on("ready", init);
 
-var objinit = new init();
+///var objinit = new init();
 
 var bandera = 1;
 
@@ -11,11 +11,13 @@ var detalleTraerCantidad = new Array();
 elementos = new Array();
 
 var email = "";
-
+let initCargado = false;
 //AgregatStockCant(21);
 
 function init() {
-
+  console.log('initCargado',initCargado);
+  if (initCargado) return;
+  initCargado = true;
     var total = 0.0;
     GetNextNumero();
     //GetTotal(19);
@@ -49,7 +51,12 @@ function init() {
     $("#btnBuscarDetIng").click(AbrirModalDetPed);
     $("#btnEnviarCorreo").click(EnviarCorreo);
     $("#btnNuevoVent").click(VerForm);
-
+    $("#txtCodigoBarras").off("keydown").on("keydown", function(e) {
+  if (e.key === "Enter") {
+        e.preventDefault(); // Detiene la acción predeterminada (por ejemplo, el envío del formulario)
+        buscarProductoByCodigo(); // Llama a tu función
+      }
+    });
     $("form#frmPedidos").submit(GuardarPedido);
 
     $("#btnGenerarVenta").click(GenerarVenta);
@@ -89,7 +96,7 @@ function init() {
     }
 
 	function GuardarPedido(e){
-		e.preventDefault();
+        e.preventDefault();
     
         if ($("#txtIdCliente").val() != "") {
             if (elementos.length > 0) {
@@ -145,6 +152,7 @@ function init() {
     }
 
     function GenerarVenta(e){
+      console.log('hhhhhhhhhhhhhh')
         e.preventDefault();
     
         if ($("#txtIdCliente").val() != "") {
@@ -172,7 +180,7 @@ function init() {
                             ListadoPedidos();
                             $.getJSON("./ajax/PedidoAjax.php?op=GetIdPedido", function(r) {
                                 if (r) {
-                                    GetTotal(r.idpedido);
+                                    GetTotal(r.idpedido);//inputMarca
                                     AgregatStockCant(r.idpedido);
                                     $("#VerFormVentaPed").show();
                                     $("#btnNuevo").hide();
@@ -186,13 +194,12 @@ function init() {
                                     //$("#VerVentaDetallePedido").hide();
                                     $("#btnEnviarCorreo").hide();
                                     ComboTipoDoc();
-
+                                    $("#cboTipoComprobante").val("TICKET");
                                     $('table#tblDetallePedidoVer th:nth-child(4)').hide();
                                     $('table#tblDetallePedidoVer th:nth-child(8)').hide();
 
                                     $('table#tblDetallePedido th:nth-child(4)').hide();
                                     $('table#tblDetallePedido th:nth-child(8)').hide();
-
                                     $.post("./ajax/PedidoAjax.php?op=GetDetallePedido", {idPedido: r.idpedido}, function(r) {
                                             $("table#tblDetallePedidoVer tbody").html(r);
                                             $("table#tblDetallePedido tbody").html(r);
@@ -250,7 +257,7 @@ function init() {
 
         $.get("./ajax/PedidoAjax.php?op=listTipoDoc", function(r) {
                 $("#cboTipoComprobante").html(r);
-            
+                $("#cboTipoComprobante").val("TICKET");
         })
     }
 
@@ -443,7 +450,7 @@ function ConsultarDetallesPed() {
         
         for (var pos in data) {
 
-            $("table#tblDetallePedido").append("<tr><td>" + data[pos][1] + " <input class='form-control' type='hidden' name='txtIdDetIng' id='txtIdDetIng[]' value='" + data[pos][0] + "' /></td><td> " + data[pos][6] + "</td><td> " + data[pos][7] + "</td><td>" + data[pos][5]+ "</td><td><input class='form-control' type='text' name='txtPrecioVentPed' id='txtPrecioVentPed[]' value='" + data[pos][2] + "' onchange='calcularTotalPed(" + pos + ")' /></td><td><input class='form-control' type='text' name='txtCantidaPed' id='txtCantidaPed[]'  value='" + data[pos][3] + "' onchange='calcularTotalPed(" + pos + ")' /></td><td><input class='form-control' type='text' name='txtDescuentoPed' id='txtDescuentoPed[]' value='" + data[pos][4] + "' onchange='calcularTotalPed(" + pos + ")' /></td><td><button type='button' onclick='eliminarDetallePed(" + pos + ")' class='btn btn-danger'><i class='fa fa-remove' ></i> </button></td></tr>");
+            $("table#tblDetallePedido").append("<tr><td>" + data[pos][1] + " <input class='form-control' type='hidden' name='txtIdDetIng' id='txtIdDetIng[]' value='" + data[pos][0] + "' /></td><td> " + data[pos][6] + "</td><td> " + data[pos][7] + "</td><td>" + data[pos][5]+ "</td><td><input class='form-control' type='text' name='txtPrecioVentPed' id='txtPrecioVentPed[]' value='" + data[pos][2] + "' onchange='calcularTotalPed(" + pos + ")' /></td><td><input class='form-control' type='text' name='txtCantidaPed' id='txtCantidaPed[]'  value='" + data[pos][3] + "' onchange='calcularTotalPed(" + pos + ")' disabled  /></td><td><input class='form-control' type='text' name='txtDescuentoPed' id='txtDescuentoPed[]' value='" + data[pos][4] + "' onchange='calcularTotalPed(" + pos + ")' /></td><td><button type='button' onclick='eliminarDetallePed(" + pos + ")' class='btn btn-danger'><i class='fa fa-remove' ></i> </button></td></tr>");
         }
         calcularIgvPed();
         calcularSubTotalPed();
@@ -779,6 +786,32 @@ function ConsultarDetallesPed() {
                 bootbox.alert("No se puede agregar al detalle. No tiene stock");
             }
         
+    }
+    function buscarProductoByCodigo(){
+        let codigo = $("#txtCodigoBarras").val();
+        const yaExiste = elementos.some(item => item[6] === codigo); 
+        if (yaExiste) {
+          //alert("El producto ya fue agregado anteriormente.");
+          bootbox.alert("El producto ya fue agregado anteriormente.");
+          return;
+        }
+        $.ajax({
+          url: './ajax/PedidoAjax.php?op=getArticleByCodigo',
+          dataType: 'json',
+          data:{codigo: codigo},
+          success: function(s){       
+            if(s.status == 'success'){
+              const articulo = s.data;
+              var detalles = new Array(articulo.iddetalle_ingreso,articulo.Articulo,articulo.precio_ventapublico,"1","0.0",articulo.stock_actual, articulo.codigo, articulo.serie); 
+              elementos.push(detalles);
+              ConsultarDetallesPed();
+            }      
+            console.log('response',s);
+          },
+          error: function(e){
+              
+          }
+        });
     }
     function GetPrimerCliente() {
         $.getJSON("./ajax/PedidoAjax.php?op=GetPrimerCliente", function(r) {

@@ -183,7 +183,15 @@
 			$query = $conexion->query($sql);
 			return $query;
 		}
-
+public function getArticleByCodigo($codigo,$idsucursal){
+			global $conexion;
+			$sql = "select distinct di.iddetalle_ingreso, di.stock_actual, a.nombre as Articulo, di.codigo, di.serie, di.precio_ventapublico, a.imagen, i.fecha
+              from ingreso i inner join detalle_ingreso di on di.idingreso = i.idingreso
+              inner join articulo a on di.idarticulo = a.idarticulo
+              where i.estado = 'A' and di.codigo ='$codigo' and i.idsucursal = $idsucursal and di.stock_actual > 0 order by i.fecha desc";
+			$query = $conexion->query($sql);
+			return $query;
+		}
 		public function ListarProveedor(){
 			global $conexion;
 			$sql = "select * from persona where tipo_persona = 'Proveedor' and estado = 'A'";
