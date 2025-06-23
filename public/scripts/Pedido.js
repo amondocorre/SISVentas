@@ -76,6 +76,7 @@ function init() {
 		e.preventDefault();
 
 		var opt = tablaArtPed.$("input[name='optDetIngBusqueda[]']:checked", {"page": "all"});
+    
 
 		opt.each(function() {
 			AgregarDetallePed($(this).val(), $(this).attr("data-nombre"), $(this).attr("data-precio-venta"), "1", "0.0", $(this).attr("data-stock-actual"), $(this).attr("data-codigo"), $(this).attr("data-serie"));
@@ -342,8 +343,11 @@ function init() {
                             console.log(e.responseText);    
                         }
                     },
-                "bDestroy": true
-
+                "bDestroy": true,
+                 "columnDefs": [
+                  { "targets": 0, "width": "40px", "className": "text-center" },
+                  { "targets": 1, "width": "100px", "className": "text-left" }
+                 ],
             }).DataTable();
 	}
 
@@ -777,11 +781,23 @@ function ConsultarDetallesPed() {
     }
 
     function AgregarPedCarrito(iddet_ing, stock_actual, art, cod, serie, precio_venta){
-       
+       const yaExiste = elementos.some(item => item[6] === cod); 
+       if(yaExiste){
+        bootbox.alert("El producto ya fue agregado anteriormente.");
+        return;
+       }
+       //const total = elementos.filter(item => item[6] === codigo).reduce((acc, item) => acc + parseFloat(item[2]), 0);
             if (stock_actual > 0) {
                 var detalles = new Array(iddet_ing, art, precio_venta, "1", "0.0", stock_actual, cod, serie);
                 elementos.push(detalles);
                 ConsultarDetallesPed();
+                /*$('#ArticuloPed').each(function () {
+                    var rowData = tabla.row(this).data();
+                    console.log('rowData',rowData);
+                    if (rowData && rowData[6] === cod) { // cambia el índice 3 según necesites
+                        $(this).hide();
+                    }
+                });*/
             } else {
                 bootbox.alert("No se puede agregar al detalle. No tiene stock");
             }
@@ -805,7 +821,9 @@ function ConsultarDetallesPed() {
               var detalles = new Array(articulo.iddetalle_ingreso,articulo.Articulo,articulo.precio_ventapublico,"1","0.0",articulo.stock_actual, articulo.codigo, articulo.serie); 
               elementos.push(detalles);
               ConsultarDetallesPed();
-            }      
+            } else{
+              bootbox.alert("No se encontro el producto.");
+            }    
             console.log('response',s);
           },
           error: function(e){

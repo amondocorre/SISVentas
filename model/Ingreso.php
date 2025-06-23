@@ -1,11 +1,13 @@
 <?php
 	require "Conexion.php";
-	
+	require_once 'Barcode.php';
 	class Ingreso{
 	
 		public function Registrar($idusuario, $idsucursal, $idproveedor, $tipo_comprobante, $serie_comprobante, $num_comprobante, $impuesto, $total, $detalle){
 			global $conexion;
+      $barcode = new Barcode();
 			$sw = true;
+      $idingreso =0;
 			try {
 				
 			
@@ -18,9 +20,18 @@
 
 				$conexion->autocommit(true);
 				foreach($detalle as $indice => $valor){
-					$sql_detalle = "INSERT INTO detalle_ingreso(idingreso, idarticulo, codigo, serie, descripcion, stock_ingreso, stock_actual, precio_compra, precio_ventadistribuidor, precio_ventapublico)
+					/*$sql_detalle = "INSERT INTO detalle_ingreso(idingreso, idarticulo, codigo, serie, descripcion, stock_ingreso, stock_actual, precio_compra, precio_ventadistribuidor, precio_ventapublico)
 											VALUES($idingreso, ".$valor[0].", '".$valor[1]."', '".$valor[2]."', '".$valor[3]."', ".$valor[4].", ".$valor[4].", ".$valor[6].", ".$valor[7].", ".$valor[8].")";
-					$conexion->query($sql_detalle) or $sw = false;
+					*/
+          $sql_detalle = "INSERT INTO detalle_ingreso(idingreso, idarticulo, codigo, serie, descripcion, stock_ingreso, stock_actual, precio_compra, precio_ventadistribuidor, precio_ventapublico)
+											VALUES($idingreso, ".$valor[0].", '".$valor[1]."', '".$valor[2]."', '".$valor[3]."', 1, 1, ".$valor[6].", ".$valor[7].", ".$valor[8].")";
+                      $stock = $valor[4];
+          for ($i=0; $i <$stock ; $i++) { 
+            $conexion->query($sql_detalle) or $sw = false;  
+            $idingresoDetalle = $conexion->insert_id;
+            $codigo = $this->GetCodigo($idingresoDetalle);
+            $barcode->generate($codigo,$idingresoDetalle);
+          }
 				}
 				if ($conexion != null) {
                 	$conexion->close();
@@ -28,9 +39,28 @@
 			} catch (Exception $e) {
 				$conexion->rollback();
 			}
-			return $sw;
+			return $sw?$idingreso:0;
 		}
-
+    public function GetCodigo($idingresoDetalle){
+			global $conexion;
+			$sql = "select * from detalle_ingreso where iddetalle_ingreso ='$idingresoDetalle'";
+			$query = $conexion->query($sql);
+			if ($query && $row = $query->fetch_assoc()) {
+        return $row['codigo'];
+      }
+      return null;
+		}
+    
+    public function listDataIngreso($idingreso){
+			global $conexion;
+			$sql = "select distinct di.iddetalle_ingreso, di.stock_actual, a.nombre as Articulo, di.codigo, di.serie, di.precio_ventapublico, a.imagen, i.fecha
+              from ingreso i inner join detalle_ingreso di on di.idingreso = i.idingreso
+              inner join articulo a on di.idarticulo = a.idarticulo
+              where i.idingreso =$idingreso";
+			$query = $conexion->query($sql);
+      return $query;
+		}
+    
 		public function Listar($idsucursal){
 			global $conexion;
 			$sql = "select i.*, p.nombre as proveedor from ingreso i inner join persona p on i.idproveedor = p.idpersona 

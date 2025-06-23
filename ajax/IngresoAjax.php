@@ -20,12 +20,27 @@ switch ($_GET["op"]) {
         $total = $_POST["total"];
 
         if(empty($_POST["idIngreso"])){
-            $hosp = $obj->Registrar($idUsuario, $idSucursal, $idproveedor, $tipo_comprobante, $serie_comprobante, $num_comprobante, $impuesto, $total, $_POST["detalle"]);
-                if ($hosp) {
+            $idingreso = $obj->Registrar($idUsuario, $idSucursal, $idproveedor, $tipo_comprobante, $serie_comprobante, $num_comprobante, $impuesto, $total, $_POST["detalle"]);
+                /*if ($hosp) {
                     echo "Ingreso Registrado";
                 } else {
                     echo "No se ha podido registrar el Ingreso";
+                }*/
+                if ($idingreso) {
+                    $response = [
+                        "status" => 'success',
+                        "message" => "Ingreso Registrado",
+                        "id" => $idingreso // si tenés este dato disponible
+                    ];
+                } else {
+                    $response = [
+                        "status" => 'error',
+                        "message" => "No se ha podido registrar el Ingreso"
+                    ];
                 }
+
+                header('Content-Type: application/json');
+                echo json_encode($response);
         } else {
             /*
             if($obj->Modificar($_POST["idIngreso"], $idCategoria, $titulo, $descripcion, $slide, $imagen_principal)){
@@ -76,10 +91,14 @@ switch ($_GET["op"]) {
                     //$reg->estado,
 
                     "8"=>($reg->estado=="A")?'<span class="badge bg-green">ACEPTADO</span>':'<span class="badge bg-red">CANCELADO</span>',
-                    "9"=>($reg->estado=="A")?'<button class="btn btn-success" data-toggle="tooltip" title="Ver Detalle" onclick="cargarDataIngreso('.$reg->idingreso.',\''.$reg->serie_comprobante.'\',\''.$reg->num_comprobante.'\',\''.$reg->impuesto.'\',\''.$reg->total.'\',\''.$reg->idingreso.'\',\''.$reg->proveedor.'\',\''.$reg->tipo_comprobante.'\')" ><i class="fa fa-eye"></i> </button>&nbsp'.
-                    '<button class="btn btn-danger" data-toggle="tooltip" title="Anular Ingreso" onclick="cancelarIngreso('.$reg->idingreso.')" ><i class="fa fa-times-circle"></i> </button>&nbsp'.
-                    '<a href="./Reportes/exIngreso.php?id='.$reg->idingreso.'" class="btn btn-primary" data-toggle="tooltip" title="Imprimir" target="blanck" ><i class="fa fa-file-text"></i> </a>':'<button class="btn btn-success" data-toggle="tooltip" title="Ver Detalle" onclick="cargarDataIngreso('.$reg->idingreso.',\''.$reg->serie_comprobante.'\',\''.$reg->num_comprobante.'\',\''.$reg->impuesto.'\',\''.$reg->total.'\',\''.$reg->idingreso.'\',\''.$reg->proveedor.'\',\''.$reg->tipo_comprobante.'\')" ><i class="fa fa-eye"></i> </button>&nbsp'.
-                    '<a href="./Reportes/exIngreso.php?id='.$reg->idingreso.'" class="btn btn-primary" data-toggle="tooltip" title="Imprimir" target="blanck" ><i class="fa fa-file-text"></i> </a>');
+                    "9" => ($reg->estado == "A")
+                        ? '<button class="btn btn-success" data-toggle="tooltip" title="Ver Detalle" onclick="cargarDataIngreso(' . $reg->idingreso . ',\'' . $reg->serie_comprobante . '\',\'' . $reg->num_comprobante . '\',\'' . $reg->impuesto . '\',\'' . $reg->total . '\',\'' . $reg->idingreso . '\',\'' . $reg->proveedor . '\',\'' . $reg->tipo_comprobante . '\')"><i class="fa fa-eye"></i></button>&nbsp' .
+                          '<button class="btn btn-danger" data-toggle="tooltip" title="Anular Ingreso" onclick="cancelarIngreso(' . $reg->idingreso . ')"><i class="fa fa-times-circle"></i></button>&nbsp' .
+                          '<a href="./Reportes/exIngreso.php?id=' . $reg->idingreso . '" class="btn btn-primary" data-toggle="tooltip" title="Imprimir" target="_blank"><i class="fa fa-file-text"></i></a>&nbsp' .
+                          '<a href="./Reportes/exCodigoBarras.php?id=' . $reg->idingreso . '" class="btn btn-warning" data-toggle="tooltip" title="Código de Barras" target="_blank"><i class="fa fa-barcode"></i></a>'
+                        : '<button class="btn btn-success" data-toggle="tooltip" title="Ver Detalle" onclick="cargarDataIngreso(' . $reg->idingreso . ',\'' . $reg->serie_comprobante . '\',\'' . $reg->num_comprobante . '\',\'' . $reg->impuesto . '\',\'' . $reg->total . '\',\'' . $reg->idingreso . '\',\'' . $reg->proveedor . '\',\'' . $reg->tipo_comprobante . '\')"><i class="fa fa-eye"></i></button>&nbsp' .
+                          '<a href="./Reportes/exIngreso.php?id=' . $reg->idingreso . '" class="btn btn-primary" data-toggle="tooltip" title="Imprimir" target="_blank"><i class="fa fa-file-text"></i></a>&nbsp' .
+                          '<a href="./Reportes/exCodigoBarras.php?id=' . $reg->idingreso . '" class="btn btn-warning" data-toggle="tooltip" title="Código de Barras" target="_blank"><i class="fa fa-barcode"></i></a>');
                 $i++;
             }
             $results = array(
@@ -198,6 +217,5 @@ switch ($_GET["op"]) {
             echo json_encode($reg);
 
             break;
-
 }
 	

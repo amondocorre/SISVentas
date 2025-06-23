@@ -144,6 +144,9 @@ function init() {
                         Limpiar();
                         OcultarForm();
                         ListadoIngresos();
+                        if(r.id){
+                           window.open("/SISVentas/Reportes/exCodigoBarras.php?id=" + r.id, '_blank');
+                        }
                     });
                 } else {
                     bootbox.alert("Debe agregar articulos al detalle");
@@ -246,7 +249,8 @@ function init() {
                             console.log(e.responseText);    
                         }
                     },
-                "bDestroy": true
+                "bDestroy": true,
+                "columnDefs": [{ "targets": 0, "width": "40px", "className": "text-center" }],
 
             }).DataTable();
 	}
@@ -363,7 +367,41 @@ function ConsultarDetalles() {
         var data = JSON.parse(objinit.consultar());
         
         for (var pos in data) {
-            $("table#tblDetalleIngreso").append("<tr><td>" + data[pos][1] + " <input class='form-control' type='hidden' name='txtIdArticulo' id='txtIdArticulo[]' value='" + data[pos][0] + "' /></td><td><input class='form-control' type='text' onkeyup='Modificar(" + pos + ");' name='txtCodgo' id='txtCodgo[]' value='" + data[pos][2] + "' /></td><td><input class='form-control' type='text' name='txtSeries' onkeyup='Modificar(" + pos + ");' id='txtSeries[]'  value='" + data[pos][3] + "' /></td><td><input class='form-control' type='text' name='txtDescripcion' onkeyup='Modificar(" + pos + ");' id='txtDescripcion[]' value='" + data[pos][4] + "' /></td><td><input class='form-control' type='text' onkeypress='return justNumbers(event);' name='txtStockIng' id='txtStockIng[]'   value='" + data[pos][5] + "' onkeyup='calcularTotal(" + pos + ");' required /></td><td><input class='form-control' type='text' onkeypress='return onKeyDecimal(event,this);' name='txtPrecioComp' id='txtPrecioComp[]'  value='" + data[pos][6] + "' onkeyup='calcularTotal(" + pos + ");' required /></td><td><input class='form-control' type='text' onkeyup='Modificar(" + pos + ");' onkeypress='return onKeyDecimal(event,this);' name='txtPrecioVentD' id='txtPrecioVentD[]'  value='" + data[pos][7] + "' required /></td><td><input class='form-control' type='text' onkeypress='return onKeyDecimal(event,this);' onkeyup='Modificar(" + pos + ");' name='txtPrecioVentaP' id='txtPrecioVentaP[]' value='" + data[pos][8] + "' required /></td><td WIDTH='100'><button type='button' data-toggle='tooltip' title='Quitar Articulo del detalle' onclick='eliminarDetalle(" + pos + ")' class='btn btn-danger'><i class='fa fa-remove' ></i> </button> <button type='button' data-toggle='tooltip' title='Pulse aqui para agregar mas filas de este articulo' onclick='AgregarDetalle(" + data[pos][0] + ",\"" + data[pos][1] +"\",\"" + data[pos][2] + "\",\"" + "" + "\",\"" + data[pos][4] + "\",\"" + data[pos][5] + "\",\"" + data[pos][6] + "\",\"" + data[pos][7] + "\",\"" + data[pos][8] + "\",\"" + data[pos][9] + "\",\"" + pos + "\")' class='btn btn-success'><i class='fa fa-plus' ></i> </button></td></tr>");
+            
+          //$("table#tblDetalleIngreso").append("<tr><td>" + data[pos][1] + " <input class='form-control' type='hidden' name='txtIdArticulo' id='txtIdArticulo[]' value='" + data[pos][0] + "' /></td><td><input class='form-control' type='text' onkeyup='Modificar(" + pos + ");' name='txtCodgo' id='txtCodgo[]' value='" + data[pos][2] + "' /></td><td><input class='form-control' type='text' name='txtSeries' onkeyup='Modificar(" + pos + ");' id='txtSeries[]'  value='" + data[pos][3] + "' /></td><td><input class='form-control' type='text' name='txtDescripcion' onkeyup='Modificar(" + pos + ");' id='txtDescripcion[]' value='" + data[pos][4] + "' /></td><td><input class='form-control' type='text' onkeypress='return justNumbers(event);' name='txtStockIng' id='txtStockIng[]'   value='" + data[pos][5] + "' onkeyup='calcularTotal(" + pos + ");' required /></td><td><input class='form-control' type='text' onkeypress='return onKeyDecimal(event,this);' name='txtPrecioComp' id='txtPrecioComp[]'  value='" + data[pos][6] + "' onkeyup='calcularTotal(" + pos + ");' required /></td><td><input class='form-control' type='text' onkeyup='Modificar(" + pos + ");' onkeypress='return onKeyDecimal(event,this);' name='txtPrecioVentD' id='txtPrecioVentD[]'  value='" + data[pos][7] + "' required /></td><td><input class='form-control' type='text' onkeypress='return onKeyDecimal(event,this);' onkeyup='Modificar(" + pos + ");' name='txtPrecioVentaP' id='txtPrecioVentaP[]' value='" + data[pos][8] + "' required /></td><td WIDTH='100'><button type='button' data-toggle='tooltip' title='Quitar Articulo del detalle' onclick='eliminarDetalle(" + pos + ")' class='btn btn-danger'><i class='fa fa-remove' ></i> </button> <button type='button' data-toggle='tooltip' title='Pulse aqui para agregar mas filas de este articulo' onclick='AgregarDetalle(" + data[pos][0] + ",\"" + data[pos][1] +"\",\"" + data[pos][2] + "\",\"" + "" + "\",\"" + data[pos][4] + "\",\"" + data[pos][5] + "\",\"" + data[pos][6] + "\",\"" + data[pos][7] + "\",\"" + data[pos][8] + "\",\"" + data[pos][9] + "\",\"" + pos + "\")' class='btn btn-success'><i class='fa fa-plus' ></i> </button></td></tr>");
+          $("table#tblDetalleIngreso").append(
+            "<tr>" +
+              "<td>" +
+                data[pos][1] + " <input class='form-control' type='hidden' name='txtIdArticulo' id='txtIdArticulo[]' value='" + data[pos][0] + "' />" +
+              "</td>" +
+              "<td hidden>" +
+                "<input class='form-control' type='text' onkeyup='Modificar(" + pos + ");' name='txtCodgo' id='txtCodgo[]' value='" + data[pos][2] + "' />" +
+              "</td>" +
+              "<td>" +
+                "<input class='form-control' type='text' name='txtSeries' onkeyup='Modificar(" + pos + ");' id='txtSeries[]' value='" + data[pos][3] + "' />" +
+              "</td>" +
+              "<td>" +
+                "<input class='form-control' type='text' name='txtDescripcion' onkeyup='Modificar(" + pos + ");' id='txtDescripcion[]' value='" + data[pos][4] + "' />" +
+              "</td>" +
+              "<td>" +
+                "<input class='form-control' type='text' onkeypress='return justNumbers(event);' name='txtStockIng' id='txtStockIng[]' value='" + data[pos][5] + "' onkeyup='calcularTotal(" + pos + ");' required />" +
+              "</td>" +
+              "<td>" +
+                "<input class='form-control' type='text' onkeypress='return onKeyDecimal(event,this);' name='txtPrecioComp' id='txtPrecioComp[]' value='" + data[pos][6] + "' onkeyup='calcularTotal(" + pos + ");' required />" +
+              "</td>" +
+              "<td>" +
+                "<input class='form-control' type='text' onkeyup='Modificar(" + pos + ");' onkeypress='return onKeyDecimal(event,this);' name='txtPrecioVentD' id='txtPrecioVentD[]' value='" + data[pos][7] + "' required />" +
+              "</td>" +
+              "<td>" +
+                "<input class='form-control' type='text' onkeypress='return onKeyDecimal(event,this);' onkeyup='Modificar(" + pos + ");' name='txtPrecioVentaP' id='txtPrecioVentaP[]' value='" + data[pos][8] + "' required />" +
+              "</td>" +
+              "<td WIDTH='100'>" +
+                "<button type='button' data-toggle='tooltip' title='Quitar Articulo del detalle' onclick='eliminarDetalle(" + pos + ")' class='btn btn-danger'><i class='fa fa-remove' ></i> </button> " +
+                "<button type='button' style='display: none;' data-toggle='tooltip' title='Pulse aqui para agregar mas filas de este articulo' onclick='AgregarDetalle(" + data[pos][0] + ",\"" + data[pos][1] +"\",\"" + data[pos][2] + "\",\"" + "" + "\",\"" + data[pos][4] + "\",\"" + data[pos][5] + "\",\"" + data[pos][6] + "\",\"" + data[pos][7] + "\",\"" + data[pos][8] + "\",\"" + data[pos][9] + "\",\"" + pos + "\")' class='btn btn-success'><i class='fa fa-plus' ></i> </button>" +
+              "</td>" +
+            "</tr>"
+          );
+
         }
         calcularIgv();
         calcularSubTotal();
