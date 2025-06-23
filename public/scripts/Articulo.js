@@ -42,7 +42,7 @@ function init(){
 
 	                {
 
-	                    swal("Mensaje del Sistema", datos, "success");
+	                    swal("Mensaje del Sistema.", datos, "success");
 						  ListadoArticulos();
 						  OcultarForm();
 						  $('#frmArticulos').trigger("reset");

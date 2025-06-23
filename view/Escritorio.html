@@ -81,21 +81,7 @@ while ($reg_Global= $query_Global->fetch_object()) {
         </div>
           <div class="row">
             <div class="col-md-6">
-              <!-- AREA CHART -->
-              <div class="box box-primary">
-                <div class="box-header with-border">
-                  <h3 class="box-title" style="font-size:17px;">Compras - Meses</h3>
-                  <div class="box-tools pull-right">
-                    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                  </div>
-                </div>
-                <div class="box-body">
-                  <div class="chart">
-                    <canvas id="areaChart" style="height:250px"></canvas>
-                  </div>
-                </div><!-- /.box-body -->
-              </div><!-- /.box -->
+                       
 
               <!-- DONUT CHART -->
               <div class="box box-danger">
@@ -111,12 +97,11 @@ while ($reg_Global= $query_Global->fetch_object()) {
                 </div><!-- /.box-body -->
               </div><!-- /.box -->
 
-            </div><!-- /.col (LEFT) -->
-            <div class="col-md-6">
-              <!-- LINE CHART -->
-              <div class="box box-info">
+               <!-- AREA CHART -->
+              
+              <div class="box box-primary">
                 <div class="box-header with-border">
-                  <h3 class="box-title" style="font-size:17px;">Ventas - Meses-</h3>
+                  <h3 class="box-title" style="font-size:17px;">Compras - Meses</h3>
                   <div class="box-tools pull-right">
                     <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                     <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
@@ -124,10 +109,16 @@ while ($reg_Global= $query_Global->fetch_object()) {
                 </div>
                 <div class="box-body">
                   <div class="chart">
-                    <canvas id="lineChart" style="height:250px"></canvas>
+                    <canvas id="areaChart" style="height:250px"></canvas>
                   </div>
-                </div><!-- /.box-body -->
-              </div><!-- /.box -->
+                </div>
+              </div>
+
+            </div><!-- /.col (LEFT) -->
+            <div class="col-md-6">
+              <!-- LINE CHART -->
+              
+             
 
               <!-- BAR CHART -->
               <div class="box box-success">
@@ -145,6 +136,21 @@ while ($reg_Global= $query_Global->fetch_object()) {
                 </div><!-- /.box-body -->
               </div><!-- /.box -->
 
+               <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title" style="font-size:17px;">Ventas - Meses-</h3>
+                  <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+                </div>
+                <div class="box-body">
+                  <div class="chart">
+                    <canvas id="lineChart" style="height:250px"></canvas>
+                  </div>
+                </div>
+              </div>
+              
             </div><!-- /.col (RIGHT) -->
           </div><!-- /.row -->
 
