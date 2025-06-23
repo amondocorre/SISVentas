@@ -139,13 +139,13 @@ function init() {
                     };
                     
                     $.post("./ajax/IngresoAjax.php?op=Save", data, function(r){
-                        swal("Mensaje del Sistema", r, "success");
+                        swal("Mensaje del Sistema.", r, "success");
                         //alert(r);
                         Limpiar();
                         OcultarForm();
                         ListadoIngresos();
                         if(r.id){
-                           window.open("/SISVentas/Reportes/exCodigoBarras.php?id=" + r.id, '_blank');
+                           window.open("/lhome/Reportes/exCodigoBarras.php?id=" + r.id, '_blank');
                         }
                     });
                 } else {
