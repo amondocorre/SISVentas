@@ -139,7 +139,7 @@ function init() {
                     };
                     
                     $.post("./ajax/IngresoAjax.php?op=Save", data, function(r){
-                        swal("Mensaje del Sistema.", r, "success");
+                        swal("Mensaje del Sistema.", "Compra registrada Exitosamente", "success");
                         //alert(r);
                         Limpiar();
                         OcultarForm();
