@@ -85,7 +85,7 @@ function init(){
                       }
                     });*/
 
-                    //location.reload();
+                    location.reload();
                 } else {
                     $("#btnNuevoPedido").show();
                     bootbox.prompt({
