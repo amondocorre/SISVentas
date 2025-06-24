@@ -375,5 +375,26 @@ switch ($_GET["op"]) {
         echo json_encode($results);
         
         break;
+     case "verificarStock":
+        require_once "../model/Pedido.php";
+        $objPedido = new Pedido();
+        $idPedido = $_REQUEST["idPedido"];
+        $query_cli = $objPedido->verificarStock($idPedido);
+        $mensaje = "Los siguientes articulos ya fueron vendidos:<br><br>";
+        $mensaje .= "<table class='table table-bordered'>";
+        $mensaje .= "<thead><tr><th>Articulo</th><th>Codigo</th></tr></thead><tbody>";
+        $tiene = false;
+        while ($fila = $query_cli->fetch_object()) {
+            $tiene = true;
+            $mensaje .= "<tr>";
+            $mensaje .= "<td>" . $fila->articulo . "</td>";
+            $mensaje .= "<td>" . $fila->codigo . "</td>";
+            $mensaje .= "</tr>";
+        }
+        $mensaje .= "</tbody></table>";
+        if($tiene){
+          echo $mensaje;
+        }else echo'';
+        break;
 }
 	

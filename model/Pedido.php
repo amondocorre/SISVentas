@@ -231,7 +231,17 @@ public function getArticleByCodigo($codigo,$idsucursal){
 			$query = $conexion->query($sql);
 			return $query;
 		}
-
+    public function verificarStock($idpedido){
+      global $conexion;
+      $sql = "select distinct a.nombre as articulo,di.codigo 
+              from pedido p 
+              inner join  detalle_pedido dp on dp.idpedido =p.idpedido
+              inner join detalle_ingreso di on di.iddetalle_ingreso = dp.iddetalle_ingreso 
+              inner join articulo a on a.idarticulo = di.idarticulo
+              where p.idpedido='$idpedido' and di.stock_actual<dp.cantidad;";
+      $query = $conexion->query($sql);
+      return $query;
+    }
 		public function GetVenta($idpedido){
 			global $conexion;
 			$sql = "select p.*, ped.fecha, s.razon_social, v.num_comprobante, v.serie_comprobante, s.tipo_documento, s.num_documento as num_sucursal, s.direccion, s.telefono as telefono_suc, s.email as email_suc, s.representante, s.logo, ped.tipo_pedido,v.impuesto,p.tipo_documento as doc
