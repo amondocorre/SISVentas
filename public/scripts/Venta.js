@@ -306,6 +306,7 @@ async function guardarYImprimir() {
   try {
     const id = $("#txtIdPedido").val();
     if (!id) throw new Error("ID de pedido no válido.");
+    window.open("/lhome/Reportes/exTicket.php?id=" + $("#txtIdPedido").val(), '_blank');
     const data = await GetVentaById(id);
     await PrintTicket(data);
   } catch (error) {
