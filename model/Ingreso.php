@@ -29,8 +29,8 @@
           for ($i=0; $i <$stock ; $i++) { 
             $conexion->query($sql_detalle) or $sw = false;  
             $idingresoDetalle = $conexion->insert_id;
-            $codigo = $this->GetCodigo($idingresoDetalle);
-            $barcode->generate($codigo,$idingresoDetalle);
+            //$codigo = $this->GetCodigo($idingresoDetalle);
+            //$barcode->generate($codigo,$idingresoDetalle);
           }
 				}
 				if ($conexion != null) {
@@ -79,9 +79,10 @@
 
 		public function GetDetalleArticulo($idingreso){
 			global $conexion;
-			$sql = "select a.nombre as articulo, di.*, (di.stock_ingreso * di.precio_compra) as sub_total
-	from detalle_ingreso di
-	inner join articulo a on di.idarticulo = a.idarticulo where di.idingreso = $idingreso";
+			$sql = "select c.nombre as categoria, a.nombre as articulo, di.*, (di.stock_ingreso * di.precio_compra) as sub_total
+              from detalle_ingreso di
+              inner join articulo a on di.idarticulo = a.idarticulo
+              inner join categoria c on c.idcategoria =a.idcategoria where di.idingreso ='$idingreso'";
 			$query = $conexion->query($sql);
 			return $query;
 		}

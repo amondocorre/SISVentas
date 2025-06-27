@@ -48,8 +48,8 @@
 
 		public function TotalPedido($idpedido){
 			global $conexion;
-			$sql = "select sum((cantidad * precio_venta) - descuento) as Total
-	from detalle_pedido where idpedido = $idpedido";
+			//$sql = "select sum((cantidad * precio_venta) - descuento) as Total from detalle_pedido where idpedido = $idpedido";
+			$sql = "SELECT SUM(cantidad * precio_venta * (1 - (descuento / 100.0))) AS Total FROM detalle_pedido where idpedido = $idpedido";
 			$query = $conexion->query($sql);
 			return $query;
 		}
@@ -148,7 +148,8 @@
 
 		public function GetTotal($idpedido){
 			global $conexion;
-			$sql = "select sum((cantidad * precio_venta) - descuento) as total from detalle_pedido where idpedido = $idpedido";
+			//$sql = "select sum((cantidad * precio_venta) - descuento) as total from detalle_pedido where idpedido = $idpedido";
+			$sql = "SELECT SUM(cantidad * precio_venta * (1 - (descuento / 100.0))) AS total FROM detalle_pedido where idpedido = $idpedido";
 			$query = $conexion->query($sql);
 			return $query;
 		}

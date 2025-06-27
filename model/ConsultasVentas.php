@@ -10,7 +10,7 @@
 
 		public function ListarVentasFechas($idsucursal, $fecha_desde, $fecha_hasta){
 			global $conexion;
-			$sql = "select p.idpedido, p.tipo_pedido, v.fecha,s.razon_social as sucursal,
+			$sql = "select distinct p.idpedido, p.tipo_pedido, v.fecha,s.razon_social as sucursal,
 				concat(e.apellidos,' ',e.nombre) as empleado,
 				pe.nombre as cliente,v.tipo_comprobante as comprobante,
 				v.serie_comprobante as serie,v.num_comprobante as numero,
@@ -32,7 +32,7 @@
 
 		public function ListarVentasDetalladas($idsucursal, $fecha_desde, $fecha_hasta){
 			global $conexion;
-			$sql = "select v.fecha,s.razon_social as sucursal,
+			$sql = "select distinct v.fecha,s.razon_social as sucursal,
 				concat(e.apellidos,' ',e.nombre) as empleado,
 				pe.nombre as cliente,v.tipo_comprobante as comprobante,
 				v.serie_comprobante as serie,v.num_comprobante as numero,
@@ -58,7 +58,7 @@
 
 		public function ListarVentasPendientes($idsucursal, $fecha_desde, $fecha_hasta){
 			global $conexion;
-			$sql = "select v.fecha,s.razon_social as sucursal,
+			$sql = "select distinct v.fecha,s.razon_social as sucursal,
 				concat(e.apellidos,' ',e.nombre) as empleado,
 				pe.nombre as cliente,v.tipo_comprobante as comprobante,
 				v.serie_comprobante as serie,v.num_comprobante as numero,
@@ -83,7 +83,7 @@
 
 		public function ListarVentasContado($idsucursal, $fecha_desde, $fecha_hasta){
 			global $conexion;
-			$sql = "select v.fecha,s.razon_social as sucursal,
+			$sql = "select distinct v.fecha,s.razon_social as sucursal,
 				concat(e.apellidos,' ',e.nombre) as empleado,
 				pe.nombre as cliente,v.tipo_comprobante as comprobante,
 				v.serie_comprobante as serie,v.num_comprobante as numero,
@@ -105,7 +105,7 @@
 
 		public function ListarVentasCredito($idsucursal, $fecha_desde, $fecha_hasta){
 			global $conexion;
-			$sql = "select v.fecha,s.razon_social as sucursal,
+			$sql = "select distinct v.fecha,s.razon_social as sucursal,
 				concat(e.apellidos,' ',e.nombre) as empleado,
 				pe.nombre as cliente,v.tipo_comprobante as comprobante,
 				v.serie_comprobante as serie,v.num_comprobante as numero,
@@ -129,7 +129,7 @@
 
 		public function ListarVentasCliente($idsucursal, $idcliente, $fecha_desde, $fecha_hasta){
 			global $conexion;
-			$sql = "select v.fecha,s.razon_social as sucursal,
+			$sql = "select distinct v.fecha,s.razon_social as sucursal,
 				concat(e.apellidos,' ',e.nombre) as empleado,
 				pe.nombre as cliente,v.tipo_comprobante as comprobante,
 				v.serie_comprobante as serie,v.num_comprobante as numero,
@@ -152,7 +152,7 @@
 
 		public function ListarVentasEmpleado($idsucursal, $idempleado, $fecha_desde, $fecha_hasta){
 			global $conexion;
-			$sql = "select v.fecha,s.razon_social as sucursal,
+			$sql = "select distinct v.fecha,s.razon_social as sucursal,
 				concat(e.apellidos,' ',e.nombre) as empleado,
 				pe.nombre as cliente,v.tipo_comprobante as comprobante,
 				v.serie_comprobante as serie,v.num_comprobante as numero,
@@ -175,7 +175,7 @@
 
 		public function ListarVentasEmpleadoDet($idsucursal, $idempleado, $fecha_desde, $fecha_hasta){
 			global $conexion;
-			$sql = "select v.fecha,s.razon_social as sucursal,
+			$sql = "select distinct v.fecha,s.razon_social as sucursal,
 				concat(e.apellidos,' ',e.nombre) as empleado,
 				pe.nombre as cliente,v.tipo_comprobante as comprobante,
 				v.serie_comprobante as serie,v.num_comprobante as numero,

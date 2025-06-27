@@ -1,133 +1,76 @@
-<?php error_reporting (0);?>
-<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link href="../public/css/ticket.css" rel="stylesheet" type="text/css">
-<script>
-    function printPantalla()
-{
-   document.getElementById('cuerpoPagina').style.marginRight  = "0";
-   document.getElementById('cuerpoPagina').style.marginTop = "1";
-   document.getElementById('cuerpoPagina').style.marginLeft = "1";
-   document.getElementById('cuerpoPagina').style.marginBottom = "0"; 
-   document.getElementById('botonPrint').style.display = "none"; 
-   window.print();
-}
-</script>
-</head>
-<body id="cuerpoPagina">
 <?php
-require_once "../model/Pedido.php";
+date_default_timezone_set('America/La_Paz'); 
 
+require_once "../model/Ingreso.php";
+require('Ingreso.php');
+require_once '../model/Barcode.php';
+session_start();
+$lo = $_SESSION["logo"];
+require_once "../model/Configuracion.php";
+require_once "../model/Pedido.php";
+$objConf = new Configuracion();
 $objPedido = new Pedido();
+$barcode = new Barcode();
+$query_conf = $objConf->Listar();
+$regConf = $query_conf->fetch_object();
+$idIngreso = isset($_GET["id"]) ? $_GET["id"] : 0;
+if ($idIngreso <= 0) {
+    die("Error: ID de Ingreso no proporcionado o inválido.");
+}
 $query_cli = $objPedido->GetVenta($_GET["id"]);
 $reg_cli = $query_cli->fetch_object();
+$query_ped = $objPedido->ImprimirDetallePedido($_GET["id"]);
+$query_total = $objPedido->TotalPedido($_GET["id"]);
+$reg_total = $query_total->fetch_object();
 
-date_default_timezone_set('America/Lima');
+$pageLayout = array(110+($query_ped->num_rows*5), 80);
+$pdf = new PDF_Invoice('P', 'mm', $pageLayout, true, 'UTF-8', false);
+$pdf->SetMargins(5, 5, 5); // <- aquí defines los márgenes
+$pdf->AddPage(); 
+$pdf->SetFont('Arial', 'B', 18); 
+$pdf->Cell(0, 8, ".::".$reg_cli->razon_social."::.", 0, 1, 'C');
+$pdf->SetFont('Helvetica', '', 7);
+$pdf->SetX(5); 
+$pdf->MultiCell(70, 4, $reg_cli->direccion, 0, 'C');
+$pdf->SetX(5); 
+$pdf->MultiCell(70, 4, $reg_cli->telefono_suc.' '.$reg_cli->tipo_documento.' '.$reg_cli->num_sucursal, 0, 'C');
+$pdf->SetX(5); 
+$pdf->SetFont('Helvetica', '', 8); 
+$pdf->MultiCell(70, 4, "Fecha/Hora: ".date("Y-m-d H:i:s"), 0, 'C');
+$pdf->SetX(5);
+$pdf->Ln(1);
+$pdf->SetFont('Helvetica', '', 12); 
+$pdf->MultiCell(70, 5,"Cliente: ". $reg_cli->nombre, 0, 'L');
+$pdf->SetX(5); 
+$pdf->MultiCell(70, 5, "Doc: ".$reg_cli->doc.": ".$reg_cli->num_documento, 0, 'L');
+$pdf->Cell(0, 8, utf8_decode("Nº de venta: ".$reg_cli->serie_comprobante." - ".$reg_cli->num_comprobante), 0, 1, 'L');
+$pdf->SetX(5); 
+$pdf->SetFont('Helvetica', '', 8); 
+$pdf->Cell(10, 5, "CANT.", 0, 0, '');
+$pdf->Cell(40, 5, utf8_decode("DESCRIPCIÓN"), 0, 0, '');
+$pdf->Cell(20, 5, "IMPORTE", 0, 1, '');
+$pdf->Cell(70, 1, "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", 0, 1, '');
+$pdf->Cell(70, 1, "", 0, 1, '');
+$descuento =0;
+$subTotal =0;
+while ($reg = $query_ped->fetch_object()) {
+  $pdf->SetFont('Helvetica', '', 8); 
+  $pdf->Cell(10, 5, $reg->cantidad , 0, 0, '');
+  $pdf->Cell(40, 5, utf8_decode($reg->articulo.""), 0, 0, '');
+  $pdf->Cell(20, 5, "".$regConf->simbolo_moneda." ".$reg->precio_venta."", 0, 1, '');
+  $subTotal += $reg->precio_venta;
+  $descuento += $reg->precio_venta*($reg->descuento/100);
+  //echo "<td>".. "Serie:".$reg->serie."</td>";
+}
 
-require_once "../model/Configuracion.php";
-$objConfiguracion = new Configuracion();
-$query_global = $objConfiguracion->Listar();
-$reg_igv = $query_global->fetch_object();
-
-?>
-
-
-<div class="zona_impresion">
-        <!-- codigo imprimir -->
-<br>
-<table border="0" align="center" width="300px">
-    <tr>
-        <td align="center">
-        .::<strong> <?php echo $reg_cli->razon_social; ?></strong>::.<br>
-        <?php echo $reg_cli->direccion; ?><br>
-        <?php echo $reg_cli->telefono_suc; ?> - <?php echo $reg_cli->tipo_documento; ?> <?php echo $reg_cli->num_sucursal; ?>
-        </td>
-    </tr>
-    <tr>
-        <td align="center"><?php echo "Fecha/Hora: ".date("Y-m-d H:i:s"); ?></td>
-    </tr>
-    <tr>
-      <td align="center"></td>
-    </tr>
-    <tr>
-        <td>Cliente: <?php echo $reg_cli->nombre; ?></td>
-    </tr>
-    <tr>
-        <td>Doc: <?php echo $reg_cli->doc.": ".$reg_cli->num_documento; ?></td>
-    </tr>
-    <tr>
-        <td>Nº de venta: <?php echo $reg_cli->serie_comprobante." - ".$reg_cli->num_comprobante ; ?></td>
-    </tr>    
-</table>
-<br>
-<table border="0" align="center" width="300px">
-    <tr>
-        <td>CANT.</td>
-        <td>DESCRIPCIÓN</td>
-        <td align="right">IMPORTE</td>
-    </tr>
-    <tr>
-      <td colspan="3">==========================================</td>
-    </tr>
-    <?php
-    $query_ped = $objPedido->ImprimirDetallePedido($_GET["id"]);
-
-        while ($reg = $query_ped->fetch_object()) {
-        echo "<tr>";
-        echo "<td>".$reg->cantidad."</td>";
-        echo "<td>".$reg->articulo. "Serie:".$reg->serie."</td>";
-        echo "<td align='right'>". $reg_igv->simbolo_moneda." ".$reg->precio_venta."</td>";
-        echo "</tr>";
-        $cantidad+=$reg->cantidad;
-    }
-    $query_total = $objPedido->TotalPedido($_GET["id"]);
-
-    $reg_total = $query_total->fetch_object();
-    ?>
-
-    <tr>
-    <td>&nbsp;</td>
-    <td align="right"><b>TOTAL:</b></td>
-    <td align="right"><b><?php echo $reg_igv->simbolo_moneda;?>  <?php echo $reg_total->Total;  ?></b></td>
-    </tr>
-    <tr>
-      <td colspan="3">Nº de artículos: <?php echo $cantidad ?></td>
-    </tr>
-    <tr>
-      <td colspan="3">&nbsp;</td>
-    </tr>      
-    <tr>
-      <td colspan="3" align="center">¡Gracias por su compra!</td>
-    </tr>
-    <!--
-    <tr>
-      <td colspan="3" align="center">AhorroCel</td>
-    </tr>
-    <tr>
-      <td colspan="3" align="center">Hermosillo - México</td>
-    </tr>
-  -->
-</table>
-<br>
-</div>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-
-<p>
-  
-<div style="margin-left:245px;"><a href="#" id="botonPrint" onClick="printPantalla();"><img src="../img/printer.png" border="0" style="cursor:pointer" title="Imprimir"></a></div>
-</body>
-</html>
+$pdf->Cell(50, 5, "SUBTOTAL: ", 0, 0, 'R');
+$pdf->Cell(20, 5, $regConf->simbolo_moneda." ".number_format($subTotal,2), 0, 1, '');
+$pdf->Cell(50, 5, "DESCUENTO: ", 0, 0, 'R');
+$pdf->Cell(20, 5, $regConf->simbolo_moneda." ".number_format($descuento,2), 0, 1, '');
+$pdf->Cell(50, 5, "TOTAL: ", 0, 0, 'R');
+$pdf->Cell(20, 5, $regConf->simbolo_moneda." ".number_format($reg_total->Total,2), 0, 1, '');
+$pdf->Ln(2);
+$pdf->Cell(79, 5, utf8_decode("Nº de artículos: ".$query_ped->num_rows), 0, 1, '');
+$pdf->Ln(2);
+$pdf->Cell(70, 5, utf8_decode("¡Gracias por su compra!"), 0, 0, 'C');
+$pdf->Output('ticket.pdf', 'I'); 

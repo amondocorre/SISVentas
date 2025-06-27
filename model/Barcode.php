@@ -24,4 +24,9 @@ class Barcode {
             return false; 
         }
     }
+    public function generate2($codigo) {
+        $generator = new BarcodeGeneratorPNG();
+        $barcodeImageData = $generator->getBarcode($codigo, $generator::TYPE_CODE_128);
+        return $barcodeImageData;
+    }
 }

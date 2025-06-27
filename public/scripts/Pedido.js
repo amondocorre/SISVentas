@@ -97,7 +97,8 @@ function init() {
         if(!codigos.includes(codigo)){
           codigos.push(codigo);
           total += valorT;
-          totalDescuento += valor;
+          totalDescuento += valorT*(valor/100) ;
+          //suma += precio * (cantidad * (1 - (porcentaje / 100)));
         }
     });
     if ($("#txtSerieVent").val() != "" && $("#txtNumeroVent").val() != "") {
@@ -121,7 +122,7 @@ function init() {
         $("#btnNuevo").hide();
         $("#VerForm").hide();
         $("#VerListado").hide();
-        $("#txtTotalVent").val(total);
+        $("#txtTotalVent").val((total-0).toFixed(2));
         $("#txtIdPedido").val(idpedido);
         $("#lblTitlePed").html("Venta");
         //Ver();
@@ -218,7 +219,7 @@ function init() {
                                     $("#VerForm").hide();
                                     $("#VerListado").hide();
                                     $("#lblTitlePed").html("Venta");
-                                    $("#txtTotalVent").val(total);
+                                    $("#txtTotalVent").val((total-0).toFixed(2));
                                     var cli = $("#txtCliente").val();
                                     $("#txtClienteVent").val(cli);
                                     $("#txtIdPedido").val(r.idpedido);
@@ -261,7 +262,7 @@ function init() {
         $.getJSON("./ajax/PedidoAjax.php?op=GetTotal", {idPedido: idPedido}, function(r) {
                 if (r) {
                     total = r.Total;
-                    $("#txtTotalVent").val(total);
+                    $("#txtTotalVent").val((total-0).toFixed(2));
 
                     var igvPed=total * parseInt($("#txtImpuesto").val())/(100+parseInt($("#txtImpuesto").val()));
                     $("#txtIgvPedVer").val(Math.round(igvPed*100)/100);
@@ -518,7 +519,11 @@ function ConsultarDetallesPed() {
         var data = JSON.parse(objinit.consultar());
         
         for (var pos in data) {
-            suma += parseFloat(data[pos][3] *  (data[pos][2] - data[pos][4]));
+            //suma += parseFloat(data[pos][3] *  (data[pos][2] - data[pos][4]));
+            var precio = parseFloat(data[pos][3]);
+            var cantidad = parseFloat(data[pos][2]);
+            var porcentaje = parseFloat(data[pos][4]);
+            suma += precio * (cantidad * (1 - (porcentaje / 100)));
         }
         var igvPed=suma * parseInt($("#txtImpuesto").val())/(100+parseInt($("#txtImpuesto").val()));
         $("#txtIgvPed").val(Math.round(igvPed*100)/100);
@@ -528,20 +533,29 @@ function ConsultarDetallesPed() {
         var suma = 0;
         var data = JSON.parse(objinit.consultar());
         for (var pos in data) {
-            suma += parseFloat(data[pos][3] * (data[pos][2] - data[pos][4]));
+            //suma += parseFloat(data[pos][3] * (data[pos][2] - data[pos][4]));
+            var precio = parseFloat(data[pos][3]);
+            var cantidad = parseFloat(data[pos][2]);
+            var porcentaje = parseFloat(data[pos][4]);
+            suma += precio * (cantidad * (1 - (porcentaje / 100)));
         }
         var subTotalPed=suma - (suma * parseInt($("#txtImpuesto").val())/(100+parseInt($("#txtImpuesto").val())));
         $("#txtSubTotalPed").val(Math.round(subTotalPed*100)/100);
     }
 
     function calcularTotalPed(posi){
+      console.log('posi---',posi);
         if(posi != null){
           ModificarPed(posi);
         }
         var suma = 0;
         var data = JSON.parse(objinit.consultar());
         for (var pos in data) {
-            suma += parseFloat(data[pos][3] * (data[pos][2] - data[pos][4]));
+            //suma += parseFloat(data[pos][3] * (data[pos][2] - data[pos][4]));
+            var precio = parseFloat(data[pos][3]);
+            var cantidad = parseFloat(data[pos][2]);
+            var porcentaje = parseFloat(data[pos][4]);
+            suma += precio * (cantidad * (1 - (porcentaje / 100)));
         }
         calcularIgvPed();
         calcularSubTotalPed();
@@ -628,7 +642,7 @@ function ConsultarDetallesPed() {
         $("#lblDesde").hide();
         $("#lblHasta").hide();
         $("#btnNuevoPedido").hide();
-        $("#txtTotalVent").val(total);
+        $("#txtTotalVent").val((total-0).toFixed(2));
     }
 
     function CargarDetallePedido(idPedido) {
@@ -757,7 +771,7 @@ function ConsultarDetallesPed() {
         $("#btnNuevo").hide();
         $("#btnEnviarCorreo").hide();
         $("#VerListado").hide();
-        $("#txtTotalVent").val(total);
+        $("#txtTotalVent").val((total-0).toFixed(2));
         $("#txtClienteVent").val(Cliente);
         $("#txtIdPedido").val(idpedido);
         email = correo;

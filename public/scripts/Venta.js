@@ -320,7 +320,7 @@ function pasarIdPedido(idPedido, total, correo){// funcion que llamamos del arch
         $("#VerTotalesDetPedido").hide();
 
 		$("#txtIdPedido").val(idPedido);
-		$("#txtTotalVent").val(total);
+		$("#txtTotalVent").val((total-0).toFixed(2));
         email = correo;
         $("#cboTipoComprobante").val("TICKET");
         VerNumSerie();
