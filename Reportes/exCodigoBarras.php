@@ -27,7 +27,7 @@ while ($reg_det = $query_ped->fetch_object()) {
     $cod = ($reg_det->codigo != "") ? $reg_det->codigo : "-";
     $barcode_image_path = '../Files/barcode/' . $reg_det->iddetalle_ingreso . '.png';
     $pdf->SetFont('Arial', '', 12); 
-    $pdf->Text(3, $y, $reg_det->iddetalle_ingreso.'-'.$reg_det->idarticulo); 
+    $pdf->Text(3, $y, $reg_det->serie); 
     $pdf->SetFont('Helvetica', '', 12); 
     $pdf->Text(35, $y, "PRECIO: ".$reg_det->precio_ventapublico." Bs."); 
     $pdf->SetFont('Helvetica', '', 20); 
