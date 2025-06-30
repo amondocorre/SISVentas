@@ -283,13 +283,14 @@ switch ($_GET["op"]) {
                     data-toggle="tooltip" title="Agregar al carrito"
                     onclick="AgregarPedCarrito('.$reg->iddetalle_ingreso.',\''.$reg->stock_actual.'\',\''.$reg->Articulo.'\',\''.$reg->codigo.'\',\''.$reg->serie.'\',\''.$reg->precio_ventapublico.'\')" >
                     <i class="fa fa-check" ></i> </button>',
-                    "1"=>$reg->Articulo,
+                    "1"=>$reg->Articulo, 
                     "2"=>$reg->codigo,
                     "3"=>$reg->serie,
                     "4"=>$reg->stock_actual,
                     "5"=>$reg->precio_ventapublico,
                     "6"=>'<img width=100px height=100px src="./'.$reg->imagen.'" />',
-                    "7"=>$reg->fecha
+                    "7"=>$reg->fecha,
+                    "8"=>$reg->iddetalle_ingreso
                     );
                 $i++;
             }
@@ -366,8 +367,10 @@ switch ($_GET["op"]) {
         $objPedido = new Pedido();
         $codigo = $_REQUEST["codigo"];
         $query_cli = $objPedido->getArticleByCodigo($codigo, $_SESSION["idsucursal"]);
-
-        $data = $query_cli->fetch_object();
+        $data = array();        
+        while($res = $query_cli->fetch_object()){
+          array_push($data,$res);
+        }
         $results = array(
         "status" => $data?'success':'error',
         "codigo" => $codigo,

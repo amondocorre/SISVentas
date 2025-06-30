@@ -65,8 +65,6 @@ function init(){
         bootbox.alert("Debe seleccionar un comprobante");
     }
   }
-  
-
     function SaveCredito(e){
         e.preventDefault();// para que no se recargue la pagina
         $.post("./ajax/CreditoAjax.php?op=SaveOrUpdate", $(this).serialize(), function(r){// llamamos la url por post. function(r). r-> llamada del callback
@@ -94,9 +92,6 @@ function init(){
             
         })
     }
-
-    
-
     function VerFormPedido(){
         $("#VerFormPed").show();// Mostramos el formulario
         $("#btnNuevoPedido").hide();// ocultamos el boton nuevo
@@ -111,19 +106,15 @@ function init(){
 		$("#VerListado").hide();// ocultamos el listado
 		$("#btnReporte").hide();
 	}
-
-	function OcultarForm(){
-		$("#VerForm").hide();// Mostramos el formulario
-		$("#VerListado").show();// ocultamos el listado
-		$("#btnReporte").show();
-        $("#btnNuevo").show();
-        $("#VerFormVentaPed").hide();
-        $("#btnNuevoVent").show();
-       // $("#lblTitlePed").html("Pedidos");
-	}
-	
-
-     function LimpiarPedido(){
+}
+function GetNextNumero() {
+    $.getJSON("./ajax/PedidoAjax.php?op=GetNextNumero", function(r) {
+            if (r) {
+                $("#txtNumeroPed").val(r.numero);
+            }
+    });
+}
+function LimpiarPedido(){
         $("#txtIdCliente").val("");
         $("#txtCliente").val("");
         
@@ -134,18 +125,17 @@ function init(){
         $("#txtSerieVent").val("");
         $("#txtNumeroVent").val("");
         GetNextNumero();
+        GetPrimerCliente()
     }
-
-    function GetNextNumero() {
-        $.getJSON("./ajax/PedidoAjax.php?op=GetNextNumero", function(r) {
-                if (r) {
-                    $("#txtNumeroPed").val(r.numero);
-                }
-        });
-    }
-
-
-}
+function OcultarForm(){
+		$("#VerForm").hide();// Mostramos el formulario
+		$("#VerListado").show();// ocultamos el listado
+		$("#btnReporte").show();
+        $("#btnNuevo").show();
+        $("#VerFormVentaPed").hide();
+        $("#btnNuevoVent").show();
+        $("#lblTitlePed").html("Pedidos");
+	}
 function VerNumSerie(){
     	var nombre = $("#cboTipoComprobante").val();
         var idsucursal = $("#txtIdSucursal").val();
@@ -244,20 +234,24 @@ function SaveOrUpdate(e){
 
       $.post("./ajax/VentaAjax.php?op=SaveOrUpdate", data, function(r){// llamamos la url por post. function(r). r-> llamada del callback
           if ($("#cboTipoComprobante").val() == "TICKET") {
-            guardarYImprimir();;
+            guardarYImprimir();
+              /*
+              swal("Mensaje del Sistema", r, "success")
+              .then(() => {
+                location.reload();
+              });
+              */
               //window.open("/lhome/Reportes/exTicket.php?id=" + $("#txtIdPedido").val(), '_blank');
           }
           if ($("#cboTipoVenta").val() == "Contado") {
-
               swal("Mensaje del Sistema", r, "success");
-
-              /*
               $("#btnNuevoPedido").show();
+              $("#modalPagar").modal("hide");
               OcultarForm();
               ListadoVenta();
               ListadoPedidos();
               LimpiarPedido();
-
+              /*
               bootbox.prompt({
                 title: "Ingrese el correo para enviar el detalle de la compra",
                 value: email,
@@ -270,7 +264,7 @@ function SaveOrUpdate(e){
                 }
               });*/
 
-              location.reload();
+              //location.reload();
           } else {
               $("#btnNuevoPedido").show();
               bootbox.prompt({
@@ -296,7 +290,7 @@ function SaveOrUpdate(e){
               });
 
           }
-          location.reload();
+          //location.reload();
       });
   } else {
       bootbox.alert("Debe seleccionar un comprobante");

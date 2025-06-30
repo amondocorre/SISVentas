@@ -20,18 +20,18 @@
 
 				$conexion->autocommit(true);
 				foreach($detalle as $indice => $valor){
-					/*$sql_detalle = "INSERT INTO detalle_ingreso(idingreso, idarticulo, codigo, serie, descripcion, stock_ingreso, stock_actual, precio_compra, precio_ventadistribuidor, precio_ventapublico)
+					$sql_detalle = "INSERT INTO detalle_ingreso(idingreso, idarticulo, codigo, serie, descripcion, stock_ingreso, stock_actual, precio_compra, precio_ventadistribuidor, precio_ventapublico)
 											VALUES($idingreso, ".$valor[0].", '".$valor[1]."', '".$valor[2]."', '".$valor[3]."', ".$valor[4].", ".$valor[4].", ".$valor[6].", ".$valor[7].", ".$valor[8].")";
-					*/
+					$conexion->query($sql_detalle) or $sw = false;  
+          $idingresoDetalle = $conexion->insert_id;
+          /*
           $sql_detalle = "INSERT INTO detalle_ingreso(idingreso, idarticulo, codigo, serie, descripcion, stock_ingreso, stock_actual, precio_compra, precio_ventadistribuidor, precio_ventapublico)
 											VALUES($idingreso, ".$valor[0].", '".$valor[1]."', '".$valor[2]."', '".$valor[3]."', 1, 1, ".$valor[6].", ".$valor[7].", ".$valor[8].")";
                       $stock = $valor[4];
           for ($i=0; $i <$stock ; $i++) { 
-            $conexion->query($sql_detalle) or $sw = false;  
-            $idingresoDetalle = $conexion->insert_id;
             //$codigo = $this->GetCodigo($idingresoDetalle);
             //$barcode->generate($codigo,$idingresoDetalle);
-          }
+          }*/
 				}
 				if ($conexion != null) {
                 	$conexion->close();

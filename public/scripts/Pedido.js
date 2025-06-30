@@ -49,6 +49,7 @@ function init() {
     $("#btnBuscarCliente").click(AbrirModalCliente);
     $("#btnBuscarDetIng").click(AbrirModalDetPed);
     $("form#frmVentas").submit(AbrirModalPagar);
+    $("form#frmVentas2").submit(AbrirModalPagar2);
     $("#btnEnviarCorreo").click(EnviarCorreo);
     $("#btnNuevoVent").click(VerForm);
     $("#txtCodigoBarras").off("keydown").on("keydown", function(e) {
@@ -94,12 +95,45 @@ function init() {
         let valor = parseFloat($(this).find("td").eq(5).text()) || 0;
         let valorT = parseFloat($(this).find("td").eq(3).text()) || 0;
         let codigo = parseFloat($(this).find("td").eq(1).text()) || '';
-        if(!codigos.includes(codigo)){
+        //if(!codigos.includes(codigo)){
           codigos.push(codigo);
           total += valorT;
           totalDescuento += valorT*(valor/100) ;
           //suma += precio * (cantidad * (1 - (porcentaje / 100)));
+        //}
+    });
+    if ($("#txtSerieVent").val() != "" && $("#txtNumeroVent").val() != "") {
+      $.post("./ajax/PedidoAjax.php?op=verificarStock", {idPedido:$("#txtIdPedido").val()}, function(r){
+        if(r){
+          bootbox.alert(r);
+          $("#modalPagar").modal("hide");
+        }else{
+          $("#modalPagar").modal("show");
+          $("#descuentoInput").val((totalDescuento/2).toFixed(2));
+          $("#valorInput").val((total/2).toFixed(2));
+          $("#pagarInput").val(((total-totalDescuento)/2).toFixed(2));
         }
+      })
+    } else {
+        bootbox.alert("Debe seleccionar un comprobante");
+    }
+  }
+  function AbrirModalPagar2(e){
+    e.preventDefault();
+    let totalDescuento = 0;
+    let total = 0;
+    let codigos = [];
+    $("#modalPagar").modal("hide");
+    $("#tblDetallePedido tbody tr").each(function() {
+        let valor = parseFloat($(this).find("td").eq(5).text()) || 0;
+        let valorT = parseFloat($(this).find("td").eq(3).text()) || 0;
+        let codigo = parseFloat($(this).find("td").eq(1).text()) || '';
+        //if(!codigos.includes(codigo)){
+          codigos.push(codigo);
+          total += valorT;
+          totalDescuento += valorT*(valor/100) ;
+          //suma += precio * (cantidad * (1 - (porcentaje / 100)));
+        //}
     });
     if ($("#txtSerieVent").val() != "" && $("#txtNumeroVent").val() != "") {
       $.post("./ajax/PedidoAjax.php?op=verificarStock", {idPedido:$("#txtIdPedido").val()}, function(r){
@@ -386,10 +420,9 @@ function init() {
                         type : "get",
                         dataType : "json",
                          dataSrc: function(json){
-                          const codigosExistentes = elementos.map(e => e[6]); // posición 6 es el código
-                          return json.aaData.filter(function(item){
-                              return !codigosExistentes.includes(item[2]); // item[2] es la columna de código que viene del backend
-                          });
+                          return json.aaData.filter(item =>
+                              item[4] > elementos.reduce((acum, e) => acum + (e[0] === item[8] ? e[3] : 0), 0)
+                          );
                       },
                         error: function(e){
                             console.log(e.responseText);    
@@ -438,11 +471,7 @@ function init() {
 
     this.eliminar = function(pos){
         //var pos = elementos[].indexOf( 'c' );
-        console.log(pos);
-        
         pos > -1 && elementos.splice(parseInt(pos),1);
-        console.log(elementos);
-        
         //this.elementos.splice(pos, 1);
         //console.log(this.elementos);
     };
@@ -495,7 +524,6 @@ function ListadoPedidos(){
         }).DataTable(); 
     };
 function eliminarDetallePed(ele){
-        console.log(ele);
         objinit.eliminar(ele);
         ConsultarDetallesPed();
     }
@@ -544,8 +572,7 @@ function ConsultarDetallesPed() {
     }
 
     function calcularTotalPed(posi){
-      console.log('posi---',posi);
-        if(posi != null){
+       if(posi != null){
           ModificarPed(posi);
         }
         var suma = 0;
@@ -846,19 +873,21 @@ function ConsultarDetallesPed() {
     }
 
     function AgregarPedCarrito(iddet_ing, stock_actual, art, cod, serie, precio_venta){
-      const yaExiste = elementos.some(item => item[6] === cod); 
-      if(yaExiste){
-      bootbox.alert("El producto ya fue agregado anteriormente.");
-      return;//const total = elementos.filter(item => item[6] === codigo).reduce((acc, item) => acc + parseFloat(item[2]), 0);
+      ///const yaExiste = elementos.some(item => item[0] === iddet_ing); 
+      if(false){
+        bootbox.alert("El producto ya fue agregado anteriormente.");
+        return;
       }
-      if (stock_actual > 0) {
+      const total =  Number(elementos.reduce((acum, e) => acum + Number(e[0] === iddet_ing ? e[3] : 0), 0))
+      if (stock_actual > total) {
           var detalles = new Array(iddet_ing, art, precio_venta, "1", "0.0", stock_actual, cod, serie);
           elementos.push(detalles);
           ConsultarDetallesPed();
           $('#tblArticulosPed')
           .DataTable()
           .rows(function(idx, data, node) {
-              return data[2] === cod; 
+              const totalNew =  elementos.reduce((acum, e) => acum + Number(e[0] == data[8] ? e[3] : 0), 0)
+              return (data[8] == iddet_ing && totalNew == data[4]); 
           })
           .remove()
           .draw();
@@ -868,6 +897,38 @@ function ConsultarDetallesPed() {
         
     }
     function buscarProductoByCodigo(){
+        let codigo = $("#txtCodigoBarras").val();
+        $.ajax({
+          url: './ajax/PedidoAjax.php?op=getArticleByCodigo',
+          dataType: 'json',
+          data:{codigo: codigo},
+          success: function(s){       
+            if(s.status == 'success'){
+              const articulos = s.data;
+              var detalles = null;
+              articulos.forEach(articulo => {
+                const total =  Number(elementos.reduce((acum, e) => acum + Number(e[0] == articulo.iddetalle_ingreso,articulo ? e[3] : 0), 0)) 
+                if(total<articulo.stock_actual){
+                  detalles = new Array(articulo.iddetalle_ingreso,articulo.Articulo,articulo.precio_ventapublico,"1","0.0",articulo.stock_actual, articulo.codigo, articulo.serie); 
+                }
+              });
+              if(detalles){
+                elementos.push(detalles);
+                $("#txtCodigoBarras").val('')
+                ConsultarDetallesPed();
+              }else{
+                bootbox.alert("No cuentas con stock en el sistema.");
+              } 
+            } else{
+              bootbox.alert("No se encontro el producto.");
+            }  
+          },
+          error: function(e){
+              
+          }
+        });
+    }
+    function buscarProductoByCodigo2(){
         let codigo = $("#txtCodigoBarras").val();
         const yaExiste = elementos.some(item => item[6] === codigo); 
         if (yaExiste) {
@@ -895,7 +956,7 @@ function ConsultarDetallesPed() {
         });
     }
     function GetPrimerCliente() {
-        $.getJSON("./ajax/PedidoAjax.php?op=GetPrimerCliente", function(r) {
+      $.getJSON("./ajax/PedidoAjax.php?op=GetPrimerCliente", function(r) {
                 if (r) {
                     $("#txtIdCliente").val(r.idpersona);
                     $("#txtCliente").val(r.nombre);
